@@ -4,13 +4,115 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Car Game</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      border: 3px solid white;
+      background: #222;
+      margin-top: 10px;
+    }
+
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      gap: 40px;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid white;
+      color: white;
+      font-size: 25px;
+      padding: 10px 25px;
+      border-radius: 15px;
+      user-select: none;
+    }
+
+    .btn:active {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    #startTilt {
+      position: fixed;
+      top: 20px;
+      background: limegreen;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      color: white;
+      padding: 10px 20px;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🚗 Welcome to the Car Game!</h1>
-    <p>Test your driving skills and have fun.</p>
-    <a href="game.html" class="play-btn">🎮 Play Game</a>
+  <!-- 🎮 The Game Canvas -->
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+  <!-- 🎮 Game Logic -->
+  <script src="game.js"></script>
+
+  <!-- 📱 Mobile Controls -->
+  <div class="controls">
+    <div class="btn" id="left">⬅️</div>
+    <div class="btn" id="right">➡️</div>
   </div>
+
+  <!-- 📱 Enable Tilt Button -->
+  <button id="startTilt">Enable Tilt Control</button>
+
+  <script>
+    // 📱 Touch Controls
+    document.getElementById("left").addEventListener("touchstart", () => {
+      let event = new KeyboardEvent("keydown", { key: "ArrowLeft" });
+      document.dispatchEvent(event);
+    });
+
+    document.getElementById("right").addEventListener("touchstart", () => {
+      let event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+      document.dispatchEvent(event);
+    });
+
+    // 📱 Tilt Controls
+    document.getElementById("startTilt").addEventListener("click", () => {
+      if (typeof DeviceOrientationEvent.requestPermission === "function") {
+        DeviceOrientationEvent.requestPermission()
+          .then((response) => {
+            if (response === "granted") {
+              alert("Tilt control enabled! 🎮");
+              document.getElementById("startTilt").style.display = "none";
+              window.addEventListener("deviceorientation", handleTilt);
+            }
+          })
+          .catch(console.error);
+      } else {
+        alert("Tilt control enabled! 🎮");
+        document.getElementById("startTilt").style.display = "none";
+        window.addEventListener("deviceorientation", handleTilt);
+      }
+    });
+
+    function handleTilt(e) {
+      if (e.gamma > 5) {
+        let event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+        document.dispatchEvent(event);
+      } else if (e.gamma < -5) {
+        let event = new KeyboardEvent("keydown", { key: "ArrowLeft" });
+        document.dispatchEvent(event);
+      }
+    }
+  </script>
 </body>
 </html>
+
